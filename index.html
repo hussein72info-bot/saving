@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة خريطة الادخار - الإصدار المطور</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>خريطة الادخار - نسخة الهاتف المطورة</title>
     <style>
         :root {
             --primary: #1a2a6c;
@@ -15,84 +15,94 @@
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
             background-color: var(--bg);
-            margin: 0; display: flex; height: 100vh; overflow: hidden;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column;
+            height: 100vh; overflow: hidden;
+            touch-action: manipulation;
         }
 
-        /* القائمة الجانبية للأيقونات */
-        #side-panel {
-            width: 200px; background: var(--primary);
-            padding: 15px; display: flex; flex-direction: column; gap: 8px;
-            overflow-y: auto; box-shadow: 5px 0 20px rgba(0,0,0,0.3); z-index: 100;
-        }
-
-        .drag-item {
-            background: white; border-radius: 6px; padding: 8px;
-            font-size: 0.8rem; font-weight: bold; text-align: center;
-            color: var(--primary); cursor: grab; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        /* منطقة العمل */
-        #game-workspace {
-            flex-grow: 1; position: relative;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        /* شريط الإحصائيات والأزرار في المنتصف بين طرائق وأقسام الادخار */
+        /* الإحصائيات في الأعلى بشكل ثابت للجوال */
         .controls-center {
-            position: absolute; left: 24%; top: 50%; transform: translateY(-50%);
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
-            background: white; padding: 15px; border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 200; border: 2px solid var(--primary);
+            width: 100%; background: white;
+            padding: 10px 0; display: flex;
+            justify-content: center; align-items: center; gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 200;
+            flex-shrink: 0;
         }
 
-        .stat-line { font-weight: bold; font-size: 0.9rem; margin: 2px 0; }
+        .stat-line { font-weight: bold; font-size: 0.8rem; }
         
         #reset-btn {
             background: var(--error); color: white; border: none;
-            padding: 8px 15px; border-radius: 20px; cursor: pointer;
-            font-weight: bold; font-family: inherit; margin-top: 5px;
+            padding: 5px 12px; border-radius: 15px; cursor: pointer;
+            font-weight: bold; font-size: 0.75rem;
+        }
+
+        /* منطقة اللعب الرئيسية */
+        #game-area {
+            flex-grow: 1; position: relative;
+            width: 100%; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
         }
 
         /* المربع المركزي */
         .central-box {
-            width: 180px; height: 100px;
+            width: 120px; height: 70px;
             background: var(--primary); color: white;
-            border-radius: 12px; display: flex; flex-direction: column;
+            border-radius: 10px; display: flex; flex-direction: column;
             align-items: center; justify-content: center; text-align: center;
-            padding: 10px; font-weight: bold; z-index: 50; border: 4px solid white;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            padding: 5px; font-weight: bold; z-index: 50; border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-size: 0.8rem;
         }
 
-        /* المستطيلات الستة */
+        /* المستطيلات - توزيع مخصص للجوال */
         .category-rect {
-            position: absolute; width: 210px;
-            background: white; border-radius: 12px; padding: 10px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-            border-top: 5px solid #2a4858; z-index: 40;
+            position: absolute; width: 140px;
+            background: white; border-radius: 10px; padding: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-top: 4px solid #2a4858; z-index: 40;
         }
 
-        /* توزيع متباعد بدقة */
-        .pos-imp  { top: 4%;   left: 50%; transform: translateX(-50%); } 
-        .pos-step { top: 8%;   right: 5%; }  
-        .pos-type { bottom: 15%; right: 5%; } 
-        .pos-form { bottom: 4%;  left: 50%; transform: translateX(-50%); } 
-        .pos-sec  { bottom: 12%; left: 5%; }  /* أسفل اليسار */
-        .pos-meth { top: 12%;  left: 5%; }   /* أعلى اليسار */
+        /* إحداثيات مخصصة لمنع التداخل على شاشات الهاتف الضيقة */
+        .pos-imp  { top: 5%;  left: 50%; transform: translateX(-50%); } 
+        .pos-step { top: 18%; right: 5%; }  
+        .pos-type { bottom: 35%; right: 5%; } 
+        .pos-form { bottom: 18%; left: 50%; transform: translateX(-50%); } 
+        .pos-sec  { bottom: 35%; left: 5%; }  
+        .pos-meth { top: 18%;  left: 5%; }   
 
         .rect-title {
-            font-weight: 800; color: var(--primary); margin-bottom: 8px;
-            text-align: center; border-bottom: 1px solid #eee; font-size: 0.85rem;
+            font-weight: 800; color: var(--primary); margin-bottom: 5px;
+            text-align: center; border-bottom: 1px solid #eee; font-size: 0.7rem;
         }
 
         .drop-grid {
-            min-height: 70px; background: #fafafa;
-            border: 2px dashed #cbd5e1; border-radius: 8px;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 5px;
+            min-height: 40px; background: #fafafa;
+            border: 1px dashed #cbd5e1; border-radius: 6px;
+            display: flex; flex-wrap: wrap; gap: 3px; padding: 4px;
         }
+
+        /* القائمة السفلية للأيقونات (بدلاً من الجانبية لسهولة اللمس) */
+        #side-panel {
+            width: 100%; height: 120px;
+            background: var(--primary);
+            padding: 10px; display: flex; flex-wrap: nowrap;
+            overflow-x: auto; gap: 10px; box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+            z-index: 100; flex-shrink: 0; align-items: center;
+        }
+
+        .drag-item {
+            flex: 0 0 auto; background: white; border-radius: 6px;
+            padding: 10px 15px; font-size: 0.75rem; font-weight: bold;
+            color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+        }
+
+        .drag-item.selected { border-color: var(--success); transform: scale(1.1); }
 
         .drag-item.placed {
             background: var(--success) !important; color: white !important;
-            padding: 4px; font-size: 0.65rem; cursor: default;
+            padding: 3px 6px; font-size: 0.6rem; margin: 2px;
         }
 
         svg#connectors {
@@ -103,40 +113,39 @@
 </head>
 <body>
 
-    <div id="side-panel"></div>
+    <div class="controls-center">
+        <div class="stat-line" style="color:var(--primary)">🔄 محاولة: <span id="tries-num">1</span></div>
+        <div class="stat-line" style="color:var(--success)">✅ صح: <span id="correct-num">0</span></div>
+        <div class="stat-line" style="color:var(--error)">❌ خطأ: <span id="wrong-num">0</span></div>
+        <button id="reset-btn" onclick="resetGame()">بدء من جديد</button>
+    </div>
 
-    <div id="game-workspace">
-        <div class="controls-center">
-            <div class="stat-line" style="color:var(--primary)">🔄 محاولة رقم: <span id="tries-num">1</span></div>
-            <div class="stat-line" style="color:var(--success)">✅ الإجابات الصح: <span id="correct-num">0</span></div>
-            <div class="stat-line" style="color:var(--error)">❌ الإجابات الخطأ: <span id="wrong-num">0</span></div>
-            <button id="reset-btn" onclick="resetGame()">بدء من جديد</button>
-        </div>
-
+    <div id="game-area">
         <svg id="connectors">
-            <line x1="50%" y1="50%" x2="50%" y2="10%" stroke="#1a2a6c" stroke-width="2" />
-            <line x1="50%" y1="50%" x2="85%" y2="25%" stroke="#1a2a6c" stroke-width="2" />
-            <line x1="50%" y1="50%" x2="85%" y2="75%" stroke="#1a2a6c" stroke-width="2" />
-            <line x1="50%" y1="50%" x2="50%" y2="90%" stroke="#1a2a6c" stroke-width="2" />
-            <line x1="50%" y1="50%" x2="15%" y2="75%" stroke="#1a2a6c" stroke-width="2" />
-            <line x1="50%" y1="50%" x2="15%" y2="25%" stroke="#1a2a6c" stroke-width="2" />
+            <line x1="50%" y1="50%" x2="50%" y2="10%" stroke="#1a2a6c" stroke-width="1.5" />
+            <line x1="50%" y1="50%" x2="85%" y2="25%" stroke="#1a2a6c" stroke-width="1.5" />
+            <line x1="50%" y1="50%" x2="85%" y2="65%" stroke="#1a2a6c" stroke-width="1.5" />
+            <line x1="50%" y1="50%" x2="50%" y2="82%" stroke="#1a2a6c" stroke-width="1.5" />
+            <line x1="50%" y1="50%" x2="15%" y2="65%" stroke="#1a2a6c" stroke-width="1.5" />
+            <line x1="50%" y1="50%" x2="15%" y2="25%" stroke="#1a2a6c" stroke-width="1.5" />
         </svg>
 
         <div class="central-box">
-            <div style="font-size: 1.1rem;">مفهوم الادخار</div>
-            <p style="font-size: 0.65rem; font-weight: normal; margin-top: 5px;">الاحتفاظ بالمال تدريجياً لتحقيق أهداف مستقبلية</p>
+            <div>مفهوم الادخار</div>
         </div>
 
-        <div class="category-rect pos-imp" data-cat="imp"><div class="rect-title">أهمية الادخار</div><div class="drop-grid" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-        <div class="category-rect pos-step" data-cat="step"><div class="rect-title">خطوات الادخار</div><div class="drop-grid" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-        <div class="category-rect pos-type" data-cat="type"><div class="rect-title">أنواع الادخار</div><div class="drop-grid" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-        <div class="category-rect pos-form" data-cat="form"><div class="rect-title">أشكال الادخار</div><div class="drop-grid" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-        <div class="category-rect pos-sec" data-cat="sec"><div class="rect-title">أقسام الادخار</div><div class="drop-grid" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
-        <div class="category-rect pos-meth" data-cat="meth"><div class="rect-title">طرائق الادخار</div><div class="drop-grid" ondrop="drop(event)" ondragover="allowDrop(event)"></div></div>
+        <div class="category-rect pos-imp" onclick="placeItem('imp')"><div class="rect-title">أهمية الادخار</div><div class="drop-grid" id="grid-imp"></div></div>
+        <div class="category-rect pos-step" onclick="placeItem('step')"><div class="rect-title">خطوات الادخار</div><div class="drop-grid" id="grid-step"></div></div>
+        <div class="category-rect pos-type" onclick="placeItem('type')"><div class="rect-title">أنواع الادخار</div><div class="drop-grid" id="grid-type"></div></div>
+        <div class="category-rect pos-form" onclick="placeItem('form')"><div class="rect-title">أشكال الادخار</div><div class="drop-grid" id="grid-form"></div></div>
+        <div class="category-rect pos-sec" onclick="placeItem('sec')"><div class="rect-title">أقسام الادخار</div><div class="drop-grid" id="grid-sec"></div></div>
+        <div class="category-rect pos-meth" onclick="placeItem('meth')"><div class="rect-title">طرائق الادخار</div><div class="drop-grid" id="grid-meth"></div></div>
     </div>
 
+    <div id="side-panel"></div>
+
     <script>
-        let tries = 1, correct = 0, wrong = 0;
+        let tries = 1, correct = 0, wrong = 0, selectedItem = null;
         const lessonItems = [
             { id: 'm1', text: 'تحقيق الأهداف المحددة', cat: 'imp' }, { id: 'm2', text: 'تجنب الدين', cat: 'imp' },
             { id: 'm3', text: 'تنمية المسؤولية المالية', cat: 'imp' }, { id: 'm4', text: 'مواجهة الطوارئ', cat: 'imp' },
@@ -157,27 +166,32 @@
             panel.innerHTML = '';
             [...lessonItems].sort(() => Math.random() - 0.5).forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'drag-item'; div.draggable = true;
+                div.className = 'drag-item';
                 div.id = item.id; div.innerText = item.text;
-                div.setAttribute('data-target', item.cat);
-                div.ondragstart = (e) => e.dataTransfer.setData("text", e.target.id);
+                div.onclick = () => selectItem(item);
                 panel.appendChild(div);
             });
         }
 
-        function allowDrop(e) { e.preventDefault(); }
-        
-        function drop(e) {
-            e.preventDefault();
-            const id = e.dataTransfer.getData("text");
-            const el = document.getElementById(id);
-            const zone = e.target.closest('.category-rect');
-            if(!zone || !el) return;
+        function selectItem(item) {
+            if(selectedItem) document.getElementById(selectedItem.id).classList.remove('selected');
+            selectedItem = item;
+            document.getElementById(item.id).classList.add('selected');
+        }
 
-            if (el.getAttribute('data-target') === zone.getAttribute('data-cat')) {
-                zone.querySelector('.drop-grid').appendChild(el);
-                el.classList.add('placed'); el.draggable = false;
+        function placeItem(cat) {
+            if(!selectedItem) return;
+            
+            if(selectedItem.cat === cat) {
+                const grid = document.getElementById('grid-' + cat);
+                const div = document.createElement('div');
+                div.className = 'drag-item placed';
+                div.innerText = selectedItem.text;
+                grid.appendChild(div);
+                
+                document.getElementById(selectedItem.id).style.display = 'none';
                 correct++; document.getElementById('correct-num').innerText = correct;
+                selectedItem = null;
             } else {
                 wrong++; document.getElementById('wrong-num').innerText = wrong;
             }
@@ -185,7 +199,7 @@
 
         function resetGame() {
             tries++; 
-            correct = 0; wrong = 0;
+            correct = 0; wrong = 0; selectedItem = null;
             document.getElementById('tries-num').innerText = tries;
             document.getElementById('correct-num').innerText = '0';
             document.getElementById('wrong-num').innerText = '0';
