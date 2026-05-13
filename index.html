@@ -1,213 +1,268 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>خريطة الادخار - نسخة الهاتف المطورة</title>
-    <style>
-        :root {
-            --primary: #1a2a6c;
-            --success: #10b981;
-            --error: #ef4444;
-            --bg: #f1f5f9;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لعبة الادخار - نسخة احترافية</title>
 
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background-color: var(--bg);
-            margin: 0; padding: 0;
-            display: flex; flex-direction: column;
-            height: 100vh; overflow: hidden;
-            touch-action: manipulation;
-        }
+<style>
+:root{
+--primary:#1a2a6c;
+--success:#10b981;
+--error:#ef4444;
+--bg:#eef2f7;
+}
 
-        /* الإحصائيات في الأعلى بشكل ثابت للجوال */
-        .controls-center {
-            width: 100%; background: white;
-            padding: 10px 0; display: flex;
-            justify-content: center; align-items: center; gap: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 200;
-            flex-shrink: 0;
-        }
+body{margin:0;font-family:tahoma;background:var(--bg);}
 
-        .stat-line { font-weight: bold; font-size: 0.8rem; }
-        
-        #reset-btn {
-            background: var(--error); color: white; border: none;
-            padding: 5px 12px; border-radius: 15px; cursor: pointer;
-            font-weight: bold; font-size: 0.75rem;
-        }
+/* HEADER */
+header{
+background:var(--primary);
+color:#fff;
+padding:10px;
+text-align:center;
+}
 
-        /* منطقة اللعب الرئيسية */
-        #game-area {
-            flex-grow: 1; position: relative;
-            width: 100%; overflow: hidden;
-            display: flex; align-items: center; justify-content: center;
-        }
+/* STATS */
+#stats{
+display:flex;
+justify-content:space-around;
+background:#fff;
+padding:8px;
+font-size:14px;
+}
 
-        /* المربع المركزي */
-        .central-box {
-            width: 120px; height: 70px;
-            background: var(--primary); color: white;
-            border-radius: 10px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; text-align: center;
-            padding: 5px; font-weight: bold; z-index: 50; border: 3px solid white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-size: 0.8rem;
-        }
+/* ITEMS */
+#panel{
+display:flex;
+flex-wrap:wrap;
+gap:6px;
+padding:10px;
+background:#2b3a8a;
+}
 
-        /* المستطيلات - توزيع مخصص للجوال */
-        .category-rect {
-            position: absolute; width: 140px;
-            background: white; border-radius: 10px; padding: 5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border-top: 4px solid #2a4858; z-index: 40;
-        }
+.item{
+background:#fff;
+padding:6px;
+border-radius:6px;
+flex:1 1 30%;
+text-align:center;
+cursor:pointer;
+font-size:13px;
+}
 
-        /* إحداثيات مخصصة لمنع التداخل على شاشات الهاتف الضيقة */
-        .pos-imp  { top: 5%;  left: 50%; transform: translateX(-50%); } 
-        .pos-step { top: 18%; right: 5%; }  
-        .pos-type { bottom: 35%; right: 5%; } 
-        .pos-form { bottom: 18%; left: 50%; transform: translateX(-50%); } 
-        .pos-sec  { bottom: 35%; left: 5%; }  
-        .pos-meth { top: 18%;  left: 5%; }   
+.item.selected{background:orange;color:#fff;}
 
-        .rect-title {
-            font-weight: 800; color: var(--primary); margin-bottom: 5px;
-            text-align: center; border-bottom: 1px solid #eee; font-size: 0.7rem;
-        }
+/* GAME */
+#game{padding:10px;}
 
-        .drop-grid {
-            min-height: 40px; background: #fafafa;
-            border: 1px dashed #cbd5e1; border-radius: 6px;
-            display: flex; flex-wrap: wrap; gap: 3px; padding: 4px;
-        }
+.central{
+background:var(--primary);
+color:#fff;
+padding:10px;
+border-radius:10px;
+text-align:center;
+margin-bottom:10px;
+}
 
-        /* القائمة السفلية للأيقونات (بدلاً من الجانبية لسهولة اللمس) */
-        #side-panel {
-            width: 100%; height: 120px;
-            background: var(--primary);
-            padding: 10px; display: flex; flex-wrap: nowrap;
-            overflow-x: auto; gap: 10px; box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
-            z-index: 100; flex-shrink: 0; align-items: center;
-        }
+.box{
+background:#fff;
+margin-bottom:10px;
+padding:10px;
+border-radius:10px;
+}
 
-        .drag-item {
-            flex: 0 0 auto; background: white; border-radius: 6px;
-            padding: 10px 15px; font-size: 0.75rem; font-weight: bold;
-            color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border: 2px solid transparent;
-        }
+.drop{
+min-height:50px;
+border:2px dashed #ccc;
+padding:5px;
+border-radius:6px;
+}
 
-        .drag-item.selected { border-color: var(--success); transform: scale(1.1); }
+.placed{
+background:var(--success);
+color:#fff;
+margin:3px;
+padding:4px;
+border-radius:5px;
+display:inline-block;
+font-size:12px;
+}
 
-        .drag-item.placed {
-            background: var(--success) !important; color: white !important;
-            padding: 3px 6px; font-size: 0.6rem; margin: 2px;
-        }
+/* RESULT */
+#result{
+position:fixed;
+top:0;left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+display:none;
+align-items:center;
+justify-content:center;
+color:#fff;
+flex-direction:column;
+font-size:20px;
+}
 
-        svg#connectors {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 10;
-        }
-    </style>
+button{
+padding:10px 15px;
+border:none;
+border-radius:8px;
+background:var(--primary);
+color:#fff;
+margin-top:10px;
+}
+</style>
 </head>
+
 <body>
 
-    <div class="controls-center">
-        <div class="stat-line" style="color:var(--primary)">🔄 محاولة: <span id="tries-num">1</span></div>
-        <div class="stat-line" style="color:var(--success)">✅ صح: <span id="correct-num">0</span></div>
-        <div class="stat-line" style="color:var(--error)">❌ خطأ: <span id="wrong-num">0</span></div>
-        <button id="reset-btn" onclick="resetGame()">بدء من جديد</button>
-    </div>
+<header>
+لعبة خريطة الادخار
+</header>
 
-    <div id="game-area">
-        <svg id="connectors">
-            <line x1="50%" y1="50%" x2="50%" y2="10%" stroke="#1a2a6c" stroke-width="1.5" />
-            <line x1="50%" y1="50%" x2="85%" y2="25%" stroke="#1a2a6c" stroke-width="1.5" />
-            <line x1="50%" y1="50%" x2="85%" y2="65%" stroke="#1a2a6c" stroke-width="1.5" />
-            <line x1="50%" y1="50%" x2="50%" y2="82%" stroke="#1a2a6c" stroke-width="1.5" />
-            <line x1="50%" y1="50%" x2="15%" y2="65%" stroke="#1a2a6c" stroke-width="1.5" />
-            <line x1="50%" y1="50%" x2="15%" y2="25%" stroke="#1a2a6c" stroke-width="1.5" />
-        </svg>
+<div id="stats">
+<div>⏱ الوقت: <span id="time">60</span></div>
+<div>✅ صح: <span id="correct">0</span></div>
+<div>❌ خطأ: <span id="wrong">0</span></div>
+<div>⭐ نقاط: <span id="score">0</span></div>
+</div>
 
-        <div class="central-box">
-            <div>مفهوم الادخار</div>
-        </div>
+<div id="panel"></div>
 
-        <div class="category-rect pos-imp" onclick="placeItem('imp')"><div class="rect-title">أهمية الادخار</div><div class="drop-grid" id="grid-imp"></div></div>
-        <div class="category-rect pos-step" onclick="placeItem('step')"><div class="rect-title">خطوات الادخار</div><div class="drop-grid" id="grid-step"></div></div>
-        <div class="category-rect pos-type" onclick="placeItem('type')"><div class="rect-title">أنواع الادخار</div><div class="drop-grid" id="grid-type"></div></div>
-        <div class="category-rect pos-form" onclick="placeItem('form')"><div class="rect-title">أشكال الادخار</div><div class="drop-grid" id="grid-form"></div></div>
-        <div class="category-rect pos-sec" onclick="placeItem('sec')"><div class="rect-title">أقسام الادخار</div><div class="drop-grid" id="grid-sec"></div></div>
-        <div class="category-rect pos-meth" onclick="placeItem('meth')"><div class="rect-title">طرائق الادخار</div><div class="drop-grid" id="grid-meth"></div></div>
-    </div>
+<div id="game">
 
-    <div id="side-panel"></div>
+<div class="central">
+مفهوم الادخار<br>
+<span style="font-size:12px">الاحتفاظ بالمال لتحقيق أهداف مستقبلية</span>
+</div>
 
-    <script>
-        let tries = 1, correct = 0, wrong = 0, selectedItem = null;
-        const lessonItems = [
-            { id: 'm1', text: 'تحقيق الأهداف المحددة', cat: 'imp' }, { id: 'm2', text: 'تجنب الدين', cat: 'imp' },
-            { id: 'm3', text: 'تنمية المسؤولية المالية', cat: 'imp' }, { id: 'm4', text: 'مواجهة الطوارئ', cat: 'imp' },
-            { id: 'm5', text: 'الأمان المالي', cat: 'imp' }, { id: 'm6', text: 'تحديد الهدف', cat: 'step' },
-            { id: 'm7', text: 'حساب التكلفة', cat: 'step' }, { id: 'm8', text: 'تحديد المدة الزمنية', cat: 'step' },
-            { id: 'm9', text: 'تحديد المبلغ المخصص للادخار', cat: 'step' }, { id: 'm10', text: 'الادخار للشراء', cat: 'type' },
-            { id: 'm11', text: 'الادخار للتقاعد', cat: 'type' }, { id: 'm12', text: 'الادخار للاستثمار', cat: 'type' },
-            { id: 'm13', text: 'ادخار السفر والتعليم', cat: 'type' }, { id: 'm14', text: 'الادخار للأطفال', cat: 'type' },
-            { id: 'm15', text: 'الادخار الطارئ', cat: 'type' }, { id: 'm16', text: 'الادخار الاختياري', cat: 'sec' },
-            { id: 'm17', text: 'الادخار الإجباري', cat: 'sec' }, { id: 'm18', text: 'الادخار التقليدي', cat: 'meth' },
-            { id: 'm19', text: 'الادخار الرقمي', cat: 'meth' }, { id: 'm20', text: 'الادخار البنكي', cat: 'meth' },
-            { id: 'm21', text: 'الادخار المالي', cat: 'form' }, { id: 'm22', text: 'ادخار الموارد', cat: 'form' },
-            { id: 'm23', text: 'ادخار الجهد والعمل الحسن', cat: 'form' }
-        ];
+<div class="box" data-cat="imp"><b>أهمية الادخار</b><div class="drop"></div></div>
+<div class="box" data-cat="step"><b>خطوات الادخار</b><div class="drop"></div></div>
+<div class="box" data-cat="type"><b>أنواع الادخار</b><div class="drop"></div></div>
+<div class="box" data-cat="form"><b>أشكال الادخار</b><div class="drop"></div></div>
+<div class="box" data-cat="sec"><b>أقسام الادخار</b><div class="drop"></div></div>
+<div class="box" data-cat="meth"><b>طرائق الادخار</b><div class="drop"></div></div>
 
-        function init() {
-            const panel = document.getElementById('side-panel');
-            panel.innerHTML = '';
-            [...lessonItems].sort(() => Math.random() - 0.5).forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'drag-item';
-                div.id = item.id; div.innerText = item.text;
-                div.onclick = () => selectItem(item);
-                panel.appendChild(div);
-            });
-        }
+</div>
 
-        function selectItem(item) {
-            if(selectedItem) document.getElementById(selectedItem.id).classList.remove('selected');
-            selectedItem = item;
-            document.getElementById(item.id).classList.add('selected');
-        }
+<div id="result">
+<div id="finalText"></div>
+<button onclick="restart()">إعادة اللعب</button>
+</div>
 
-        function placeItem(cat) {
-            if(!selectedItem) return;
-            
-            if(selectedItem.cat === cat) {
-                const grid = document.getElementById('grid-' + cat);
-                const div = document.createElement('div');
-                div.className = 'drag-item placed';
-                div.innerText = selectedItem.text;
-                grid.appendChild(div);
-                
-                document.getElementById(selectedItem.id).style.display = 'none';
-                correct++; document.getElementById('correct-num').innerText = correct;
-                selectedItem = null;
-            } else {
-                wrong++; document.getElementById('wrong-num').innerText = wrong;
-            }
-        }
+<script>
+let selected=null;
+let correct=0,wrong=0,score=0,time=60;
 
-        function resetGame() {
-            tries++; 
-            correct = 0; wrong = 0; selectedItem = null;
-            document.getElementById('tries-num').innerText = tries;
-            document.getElementById('correct-num').innerText = '0';
-            document.getElementById('wrong-num').innerText = '0';
-            document.querySelectorAll('.drop-grid').forEach(grid => grid.innerHTML = '');
-            init();
-        }
+const items=[
+{id:1,text:'تحقيق الأهداف',cat:'imp'},
+{id:2,text:'تجنب الدين',cat:'imp'},
+{id:3,text:'الأمان المالي',cat:'imp'},
 
-        window.onload = init;
-    </script>
+{id:4,text:'تحديد الهدف',cat:'step'},
+{id:5,text:'حساب التكلفة',cat:'step'},
+
+{id:6,text:'الادخار للشراء',cat:'type'},
+{id:7,text:'الادخار للتقاعد',cat:'type'},
+
+{id:8,text:'الادخار المالي',cat:'form'},
+{id:9,text:'ادخار الموارد',cat:'form'},
+
+{id:10,text:'اختياري',cat:'sec'},
+{id:11,text:'إجباري',cat:'sec'},
+
+{id:12,text:'تقليدي',cat:'meth'},
+{id:13,text:'رقمي',cat:'meth'}
+];
+
+function init(){
+let panel=document.getElementById("panel");
+panel.innerHTML="";
+
+items.sort(()=>Math.random()-0.5).forEach(i=>{
+let div=document.createElement("div");
+div.className="item";
+div.innerText=i.text;
+div.dataset.cat=i.cat;
+
+div.onclick=()=>{
+document.querySelectorAll('.item').forEach(e=>e.classList.remove('selected'));
+div.classList.add('selected');
+selected=div;
+};
+
+panel.appendChild(div);
+});
+}
+
+document.querySelectorAll(".box").forEach(box=>{
+box.onclick=()=>{
+if(!selected) return;
+
+if(selected.dataset.cat===box.dataset.cat){
+let el=document.createElement("div");
+el.className="placed";
+el.innerText=selected.innerText;
+
+box.querySelector(".drop").appendChild(el);
+selected.remove();
+
+correct++;
+score+=10;
+playSound(true);
+
+}else{
+wrong++;
+score-=5;
+playSound(false);
+}
+
+update();
+selected=null;
+};
+});
+
+function update(){
+document.getElementById("correct").innerText=correct;
+document.getElementById("wrong").innerText=wrong;
+document.getElementById("score").innerText=score;
+}
+
+function timer(){
+let t=setInterval(()=>{
+time--;
+document.getElementById("time").innerText=time;
+
+if(time<=0){
+clearInterval(t);
+endGame();
+}
+},1000);
+}
+
+function endGame(){
+document.getElementById("result").style.display="flex";
+document.getElementById("finalText").innerText=
+"انتهى الوقت\nالنقاط: "+score;
+}
+
+function restart(){
+location.reload();
+}
+
+/* أصوات */
+function playSound(correct){
+let audio=new Audio(correct?
+"https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3":
+"https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"
+);
+audio.play();
+}
+
+init();
+timer();
+</script>
+
 </body>
 </html>
